@@ -2,12 +2,12 @@ package com.wbb.bottomslide
 
 import android.animation.ObjectAnimator
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.TabLayout
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -43,14 +43,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun initBehavior() {
         val behavior = BottomSheetBehavior.from(nestedScrollView)
-        behavior.peekHeight = peekHeight
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
         behavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 val layoutParams = bottomSheet.layoutParams
+                //如果控件本身的Height值就小于返回按钮的高度，就不用做处理
                 if (bottomSheet.height > heightPixels - marginTop) {
+                    //屏幕高度减去marinTop作为控件的Height
                     layoutParams.height = heightPixels - marginTop
                     bottomSheet.layoutParams = layoutParams
                 }
@@ -58,9 +59,19 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 var distance: Float = 0F;
-                //slideOffset的值在0-1区间 向上拖拽趋近1，向下拖拽趋近0
+                /**
+                 * slideOffset为底部的新偏移量，值在[-1,1]范围内。当BottomSheetBehavior处于折叠(STATE_COLLAPSED)和
+                 * 展开(STATE_EXPANDED)状态之间时,它的值始终在[0,1]范围内，向上移动趋近于1，向下区间于0。[-1,0]处于
+                 * 隐藏状态(STATE_HIDDEN)和折叠状态(STATE_COLLAPSED)之间。
+                 */
+
+                //这里的BottomSheetBehavior初始化完成后，界面设置始终可见，所以不用考虑[-1,0]区间
+                //色差值变化->其实是遮罩的透明度变化，拖拽至最高，顶部成半透明色
                 maskView.alpha = slideOffset
+                //offsetDistance是initSystem()中获得的，是返回按钮至根布局的距离
                 distance = offsetDistance * slideOffset
+                //当BottomSheetBehavior由隐藏状态变为折叠状态(即gif图开始的由底部滑出至设置的最小高度)
+                //slide在[-1,0]的区间内，不加判断会出现顶部布局向下偏移的情况。
                 if (distance > 0) {
                     constraint.translationY = -distance
                 }
@@ -79,9 +90,9 @@ class MainActivity : AppCompatActivity() {
 
         })
         mHandler.postDelayed({
+            behavior.isHideable = false
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
             behavior.peekHeight = peekHeight
-            behavior.isHideable = false
             ObjectAnimator.ofFloat(nestedScrollView, "alpha", 0f, 1f).setDuration(500).start()
         }, 200)
     }
