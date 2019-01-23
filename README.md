@@ -6,11 +6,11 @@
 
 先来看下成品效果：
 
-![效果图.gif](https://upload-images.jianshu.io/upload_images/8518082-48e41f9026b4db59.gif?imageMogr2/auto-orient/strip)
+![效果图.gif](https://github.com/weibindev/BottomSlide/blob/master/screenshot/8518082-48e41f9026b4db59.gif)
 
 #### 实现思路分析：
-1. 界面上可以分为两个部分：顶部部分包括一系列的图片和按钮控件；底部部分是用NestedScrollView包裹实现的界面,并且指定 `app:layout_behavior="@string/bottom_sheet_behavior"`。界面根布局采用CoordinatorLayout，与BottomSheetBehavior包装底部部分的布局实现拖拽。
-2. 当界面初始化时，BottomSheetBehavior以淡入的方式平滑至设定的最小高度。在BottomSheetBehavior拖拽过程中，通过代码改变View的layoutParams属性使其达到所能拖拽的最大高度。
+1. 界面上可以分为两个部分：顶部部分包括一系列的图片和按钮控件；底部部分是用`NestedScrollView`包裹实现的界面,并且指定 `app:layout_behavior="@string/bottom_sheet_behavior"`。界面根布局采用`CoordinatorLayout`，与`BottomSheetBehavior`包装底部部分的布局实现拖拽。
+2. 当界面初始化时，`BottomSheetBehavior`以淡入的方式平滑至设定的最小高度。在`BottomSheetBehavior`拖拽过程中，通过代码改变View的`layoutParams`属性使其达到所能拖拽的最大高度。
 3. 除去底部部分初始化淡入的过程，其余时间顶部部分都会发生色差值和视图偏移的变化。
 
 #### 界面布局：
@@ -291,7 +291,7 @@
 
 </android.support.v4.widget.NestedScrollView>
 ```
-在`<android.support.v4.widget.NestedScrollView`中加入了`app:layout_behavior="@string/bottom_sheet_behavior"`。除此之外，还有三个关于BottomSheetBehavior相关的xml属性：
+在`<android.support.v4.widget.NestedScrollView`中加入了`app:layout_behavior="@string/bottom_sheet_behavior"`。除此之外，还有三个关于`BottomSheetBehavior`相关的xml属性：
 
 ```
 app:behavior_hideable 设置此底部工作表在向下滑动时是否可以隐藏。
@@ -300,7 +300,7 @@ app:behavior_peekHeight 设置折叠时底部工作表的高度
 
 app:behavior_skipCollapsed  设置此底部工作表在展开一次后是否应在隐藏时跳过折叠状态。除非工作表可隐藏，否则将此设置为true无效。
 ```
-顺便附上BottomSheetBehavior的5种状态：
+顺便附上`BottomSheetBehavior`的5种状态：
 
 ```
 STATE_COLLAPSED：底部页面折叠。
@@ -324,7 +324,7 @@ STATE_HIDDEN：底部页面是隐藏的。
 ```
 最小高度已经搞定了，使用`setPeekHeight`生效。那么最大高度该如何实现呢，我查看文档，发现api并没有提供相关的函数来实现这一功能。这样的话，我们可以改变布局控件自身的高度来实现，也就是layoutParams.heigth。
 
-说是这么说，我们还是得取一个参照物的高度值套进layoutParams.heigth。这里我就采用返回按钮做为参照物，即底部的最大高度不遮挡返回按钮。
+说是这么说，我们还是得取一个参照物的高度值套进`layoutParams.heigth`。这里我就采用返回按钮做为参照物，即底部的最大高度不遮挡返回按钮。
 ```Kotlin
 imageView.post {
      val lp = imageView.layoutParams as ConstraintLayout.LayoutParams
